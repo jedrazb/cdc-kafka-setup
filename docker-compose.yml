@@ -1,0 +1,55 @@
+version: '3'
+services:
+  zookeeper:
+    platform: linux/amd64 # Needed for my mac m2
+    image: confluentinc/cp-zookeeper:6.2.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    platform: linux/amd64 # Needed for my mac m2
+    image: confluentinc/cp-kafka:6.2.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  mysql:
+    platform: linux/amd64 # Needed for my mac m2
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+    ports:
+      - "3306:3306"
+
+  debezium:
+    platform: linux/amd64 # Needed for my mac m2
+    image: debezium/connect:1.7
+    depends_on:
+      - kafka
+      - mysql
+    volumes:
+      - ./debezium-config.json:/debezium-config.json
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      CONFIG_STORAGE_TOPIC: debezium-configs
+      OFFSET_STORAGE_TOPIC: debezium-offsets
+      STATUS_STORAGE_TOPIC: debezium-status
+      GROUP_ID: mydb
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_PORT: 8083
+      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+      CONNECT_PLUGIN_PATH: "/kafka/plugins"
+
+networks:
+  default:
+    driver: bridge
