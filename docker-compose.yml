@@ -2,6 +2,7 @@ version: '3'
 services:
   zookeeper:
     platform: linux/amd64 # Needed for my mac m2
+    container_name: zookeeper
     image: confluentinc/cp-zookeeper:7.5.0
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -10,6 +11,7 @@ services:
   kafka:
     platform: linux/amd64 # Needed for my mac m2
     image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
     depends_on:
       - zookeeper
     ports:
@@ -23,6 +25,7 @@ services:
   mysql:
     platform: linux/amd64 # Needed for my mac m2
     image: mysql:8.1
+    container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mydb
@@ -31,13 +34,14 @@ services:
 
   debezium:
     platform: linux/amd64 # Needed for my mac m2
-    image: debezium/connect:2.3
+    image: debezium/connect:2.3.3.Final
+    container_name: debezium
     depends_on:
       - kafka
       - mysql
     volumes:
       - ./debezium-config.json:/debezium-config.json
-      - ./debezium-plugins:/kafka/plugins
+      - ./plugins:/kafka/plugins
     environment:
       BOOTSTRAP_SERVERS: kafka:9092
       CONFIG_STORAGE_TOPIC: debezium-configs

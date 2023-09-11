@@ -16,9 +16,37 @@ Confirm containers are running
 docker-compose ps
 ```
 
-Create mysql table and insert some data, note `cdc-kafka-setup-mysql-1` should match the container name for mysql
+Create mysql `users` table
 
 ```bash
-docker exec -i cdc-kafka-setup-mysql-1 mysql -uroot -proot mydb < create_table.sql
-docker exec -i cdc-kafka-setup-mysql-1 mysql -uroot -proot mydb < insert_data.sql
+docker exec -i mysql mysql -uroot -proot mydb < create_table.sql
+```
+
+Start mysql CDC connector
+
+```bash
+docker exec -it debezium /bin/bash
+```
+
+```bash
+# Exec this inside debezium shell
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d @/debezium-config.json
+```
+
+Ingest some data into mysql
+
+```bash
+docker exec -i mysql mysql -uroot -proot mydb < insert_data.sql
+```
+
+Verify that the data is present in mysql
+
+```bash
+docker exec -i mysql mysql -uroot -proot mydb < query_data.sql
+```
+
+Verify that the data is replicated into a kafka topic:
+
+```bash
+docker exec -it kafka kafka-topics --list --bootstrap-server kafka:9092
 ```

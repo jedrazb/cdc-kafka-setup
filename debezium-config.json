@@ -11,7 +11,9 @@
     "database.server.name": "mydb",
     "database.whitelist": "mydb",
     "table.whitelist": "mydb.users",
-    "database.history.kafka.bootstrap.servers": "kafka:9092",
-    "database.history.kafka.topic": "schema-changes.mydb"
+    "topic.prefix": "cdctest",
+    "schema.history.internal.kafka.bootstrap.servers": "kafka:9092",
+    "schema.history.internal.kafka.topic": "schema-changes.inventory",
+    "plugin.path": "/kafka/plugins/debezium-connector-mysql"
   }
 }
