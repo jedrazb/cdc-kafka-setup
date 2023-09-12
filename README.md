@@ -53,3 +53,8 @@ Final verification step, list all data in the `cdctest.mydb.users` topic.
 ```bash
 docker exec -it kafka kafka-console-consumer --topic cdctest.mydb.users --from-beginning --bootstrap-server localhost:9092
 ```
+
+### How to connecto to Kafka
+
+Kafka broker address to connect from host: `localhost:29092`
+CDC topic: `cdctest.mydb.users`
