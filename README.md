@@ -16,7 +16,7 @@ Confirm containers are running
 docker-compose ps
 ```
 
-Create mysql `users` table
+Wait for mysql to be ready, look for `/usr/sbin/mysqld: ready for connections. Version: '8.1.0'` in logs. Create mysql `users` table.
 
 ```bash
 docker exec -i mysql mysql -uroot -proot mydb < create_table.sql
