@@ -22,15 +22,10 @@ Create mysql `users` table
 docker exec -i mysql mysql -uroot -proot mydb < create_table.sql
 ```
 
-Start mysql CDC connector
+Start mysql CDC debezium connector
 
 ```bash
-docker exec -it debezium /bin/bash
-```
-
-```bash
-# Exec this inside debezium shell
-curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d @/debezium-config.json
+docker exec -i debezium curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d @/debezium-config.json
 ```
 
 Ingest some data into mysql
@@ -49,4 +44,12 @@ Verify that the data is replicated into a kafka topic:
 
 ```bash
 docker exec -it kafka kafka-topics --list --bootstrap-server kafka:9092
+```
+
+You should see `cdctest.mydb.users` present in the response.
+
+Final verification step, list all data in the `cdctest.mydb.users` topic.
+
+```bash
+docker exec -it kafka kafka-console-consumer --topic cdctest.mydb.users --from-beginning --bootstrap-server localhost:9092
 ```
